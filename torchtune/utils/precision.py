@@ -54,6 +54,8 @@ def verify_bf16_support():
     return (
         torch.cuda.is_available()
         and torch.cuda.is_bf16_supported()
+        # Added fix for ROCM and AMD GPUs via torch.version.hip which support BF16 but fail the torch.version.cuda check
+        and ((torch.version.cuda and packaging.version.parse(torch.version.cuda).release >= (11, 0)) or torch.version.hip) 
         and torch.distributed.is_nccl_available()
         and torch.cuda.nccl.version() >= (2, 10)
     )
